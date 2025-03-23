@@ -17,6 +17,10 @@ const ProjectSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
+  budget:{
+    type: String,
+    required: true
+  },
   tasks: [
     {
       type: mongoose.Schema.Types.ObjectId,

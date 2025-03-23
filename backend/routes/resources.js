@@ -6,8 +6,8 @@ const Project =  require ("../models/Project")
 
 router.post("/", async (req, res) => {
     try {
-        const { title, quantity, description , taskId} = req.body
-        const resource = new Resource({ title, quantity, description })
+        const { title, type, quantity, description, supplier, taskId} = req.body
+        const resource = new Resource({ title, type, quantity, description, supplier })
         await resource.save()
 
         if (taskId) {
@@ -40,7 +40,10 @@ router.get("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
     try {
-        const updatedResource = await Resource.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedResource = await Resource.findByIdAndUpdate(
+            req.params.id, 
+            { $set: req.body}, 
+            { new: true, runValidators: true });
         res.json(updatedResource);
     } catch (error) {
         res.status(500).json({ error: error.message });

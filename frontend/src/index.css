@@ -1,8 +1,9 @@
 @import "tailwindcss";
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.2;
+  font-weight: 300;
 
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);
@@ -14,48 +15,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+@layer base {
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+  html{
+      @apply bg-gray-300  text-black transition; 
   }
-  a:hover {
-    color: #747bff;
+  
+  *{
+      @apply my-0.5;
   }
-  button {
-    background-color: #f9f9f9;
+
+  button{
+      @apply px-3 text-sm py-2 rounded-lg cursor-pointer transition 
+      hover:duration-400 hover:opacity-80 hover:scale-105
+      disabled:bg-slate-400/30 disabled:cursor-auto 
+      hover:disabled:opacity-100 hover:disabled:scale-none;
+  }
+
+  .primary-btn{
+      @apply bg-blue-600 font-bold text-[15px] text-white
+  }
+
+  input{
+      @apply px-1.5 py-1 outline-none border rounded-sm font-bold placeholder:italic placeholder:font-light;
+  }
+
+  input.input-error, select.input-error {
+    @apply outline-none border-red-500
   }
 }

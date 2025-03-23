@@ -44,7 +44,16 @@ router.get("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
     try {
-        const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedTask = await Task.findByIdAndUpdate(
+            req.params.id, 
+            { $set: req.body}, 
+            { new: true, runValidators: true }
+        ).populate("resources");
+
+        if (!updatedTask) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+    
         res.json(updatedTask);
     } catch (error) {
         res.status(500).json({ error: error.message });
