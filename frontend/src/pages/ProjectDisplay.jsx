@@ -9,7 +9,8 @@ import { ModifyIcon } from "../icons/ModifyIcon";
 import { AddIcon } from "../icons/AddIcon";
 import ProjectCard from "../components/ProjectCard";
 import TaskListCard from "../components/TaskListCard";
-import { addtask } from "../schemas/addtask";
+import { addTask } from "../schemas/addtask";
+import { addProject } from "../schemas/addproject";
 
 function ProjectDisplay() {
   const navigate = useNavigate();
@@ -17,29 +18,32 @@ function ProjectDisplay() {
   const [project, setProject] = useState(null);
   const [viewInfo, setviewInfo] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const onSubmit = async (values, actions) => {
-    await createTask(values, () => {
-      actions.resetForm();
-    });
-  };
-
-  const {
-    values,
-    errors,
-    touched,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    isSubmitting,
-  } = useFormik({
+  const taskFormik = useFormik({
     initialValues: {
       description: "",
       startDate: "",
       endDate: "",
     },
-    validationSchema: addtask,
-    onSubmit,
+    validationSchema: addTask,
+
+    onSubmit: async (values, actions) => {
+      await createTask(values, () => {
+        actions.resetForm();
+      });
+    },
+  });
+
+  const updateProjectFormik = useFormik({
+    initialValues: {
+      updatedName: "",
+      updatedDescription: "",
+      updatedStartDate: "",
+      updatedEndDate: "",
+      updatedBudget: "",
+    },
+    validationSchema: addProject,
   });
 
   useEffect(() => {
@@ -48,7 +52,6 @@ function ProjectDisplay() {
         const response = await axios.get(
           `http://127.0.0.1:7460/api/projects/${projectId}`
         );
-        console.log("Fetched data:", response.data);
         setProject(response.data);
       } catch (error) {
         console.error("Error fetching project details:", error);
@@ -69,7 +72,7 @@ function ProjectDisplay() {
         projectId: projectId,
       });
 
-      const newTask = res.data
+      const newTask = res.data;
 
       setProject((prevProject) => ({
         ...prevProject,
@@ -89,17 +92,46 @@ function ProjectDisplay() {
 
   const deleteProject = async (projectId) => {
     try {
-      const response = await axios.delete(`http://127.0.0.1:7460/api/projects/${projectId}`)
+      const response = await axios.delete(
+        `http://127.0.0.1:7460/api/projects/${projectId}`
+      );
 
       if (response.status === 200) {
-        toast.success("Project deleted successfully!", {duration:4000})
-        navigate('/')
+        toast.success("Project deleted successfully!", { duration: 4000 });
+        navigate("/");
       } else {
-        toast.error("Failed to delete projct", {duration:4000});
+        toast.error("Failed to delete projct", { duration: 4000 });
         console.error("Failed to delete projct");
       }
     } catch (error) {
-      toast.error("Error Deleting Project", {duration:4000})
+      toast.error("Error Deleting Project", { duration: 4000 });
+      console.error("Error Deleting Project", error);
+    }
+  };
+
+
+  const updateProject = async () => {
+    try {
+      const response = await axios.put(
+        `http://127.0.0.1:7460/api/projects/${projectId}`,
+        {
+          name: updateProjectFormik.values.updatedName,
+          description: updateProjectFormik.values.updatedDescription,
+          startDate: updateProjectFormik.values.updatedStartDate,
+          endDate: updateProjectFormik.values.updatedEndDate,
+          budget: updateProjectFormik.values.updatedBudget,
+        }
+      );
+
+      toast.success("Project Updated Successfully!", { duration: 4000 });
+      setProject(response.data);
+
+      setTimeout(() => {
+        updateProjectFormik.resetForm();
+        setIsEditing(false);
+      }, 700);
+    } catch (error) {
+      toast.error("Error Updating Project", { duration: 4000 });
       console.error("Error Deleting Project", error);
     }
   };
@@ -114,17 +146,20 @@ function ProjectDisplay() {
       <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
         <div className="flex justify-between">
           <div className="flex items-center">
-            <button onClick={() => navigate('/')} className="text-2xl">
+            <button onClick={() => navigate("/")} className="text-2xl">
               <BackIcon />
             </button>
             <p className="text-2xl text-blue-800">{project.name}</p>
           </div>
 
           <div className="flex">
-            <button className="text-2xl">
+            <button className="text-2xl" onClick={() => setIsEditing(true)}>
               <ModifyIcon />
             </button>
-            <button className="text-2xl" onClick={()=>deleteProject(projectId)}>
+            <button
+              className="text-2xl"
+              onClick={() => deleteProject(projectId)}
+            >
               <DeleteIcon />
             </button>
           </div>
@@ -201,7 +236,7 @@ function ProjectDisplay() {
       {isAdding && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
           <form
-            onSubmit={handleSubmit}
+            onSubmit={taskFormik.handleSubmit}
             className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%]"
           >
             <h2 className="text-lg text-center font-bold mb-4">Add Task</h2>
@@ -209,18 +244,21 @@ function ProjectDisplay() {
             <label className="block text-gray-600">Description:</label>
             <textarea
               name="description"
-              value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              value={taskFormik.values.description}
+              onChange={taskFormik.handleChange}
+              onBlur={taskFormik.handleBlur}
               className={
-                errors.description && touched.description
+                taskFormik.errors.description && taskFormik.touched.description
                   ? "input-error w-full p-2 border rounded"
                   : "w-full p-2 border rounded"
               }
             />
-            {errors.description && touched.description && (
-              <p className="text-xs mb-1 text-red-500">{errors.description}</p>
-            )}
+            {taskFormik.errors.description &&
+              taskFormik.touched.description && (
+                <p className="text-xs mb-1 text-red-500">
+                  {taskFormik.errors.description}
+                </p>
+              )}
 
             <div className="flex gap-7">
               <div className="w-1/2">
@@ -228,20 +266,21 @@ function ProjectDisplay() {
                 <input
                   type="datetime-local"
                   name="startDate"
-                  onChange={handleChange}
-                  value={values.startDate}
-                  onBlur={handleBlur}
+                  onChange={taskFormik.handleChange}
+                  value={taskFormik.values.startDate}
+                  onBlur={taskFormik.handleBlur}
                   className={
-                    errors.startDate && touched.startDate
+                    taskFormik.errors.startDate && taskFormik.touched.startDate
                       ? "input-error w-full p-2 border rounded"
                       : "w-full p-2 border rounded"
                   }
                 />
-                {errors.startDate && touched.startDate && (
-                  <p className="text-xs mb-1 text-red-500">
-                    {errors.startDate}
-                  </p>
-                )}
+                {taskFormik.errors.startDate &&
+                  taskFormik.touched.startDate && (
+                    <p className="text-xs mb-1 text-red-500">
+                      {taskFormik.errors.startDate}
+                    </p>
+                  )}
               </div>
 
               <div className="w-1/2">
@@ -249,17 +288,19 @@ function ProjectDisplay() {
                 <input
                   type="datetime-local"
                   name="endDate"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  value={values.endDate}
+                  onChange={taskFormik.handleChange}
+                  onBlur={taskFormik.handleBlur}
+                  value={taskFormik.values.endDate}
                   className={
-                    errors.endDate && touched.endDate
+                    taskFormik.errors.endDate && taskFormik.touched.endDate
                       ? "input-error w-full p-2 border rounded"
                       : "w-full p-2 border rounded"
                   }
                 />
-                {errors.endDate && touched.endDate && (
-                  <p className="text-xs mb-1 text-red-500">{errors.endDate}</p>
+                {taskFormik.errors.endDate && taskFormik.touched.endDate && (
+                  <p className="text-xs mb-1 text-red-500">
+                    {taskFormik.errors.endDate}
+                  </p>
                 )}
               </div>
             </div>
@@ -272,7 +313,7 @@ function ProjectDisplay() {
                 Cancel
               </button>
               <button
-                disabled={isSubmitting}
+                disabled={taskFormik.isSubmitting}
                 type="submit"
                 className="w-[50%] px-4 py-2 bg-blue-600 text-white rounded-md"
               >
@@ -280,6 +321,141 @@ function ProjectDisplay() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
+          <div
+            className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%]"
+          >
+            <h2 className="text-lg text-center font-bold mb-4">
+              Modify Project
+            </h2>
+            <label className="block text-gray-600">Project Name:</label>
+            <input
+              type="text"
+              name="updatedName"
+              value={updateProjectFormik.values.updatedName}
+              onChange={updateProjectFormik.handleChange}
+              onBlur={updateProjectFormik.handleBlur}
+              className={
+                updateProjectFormik.errors.updatedName &&
+                updateProjectFormik.touched.updatedName
+                  ? "input-error w-full p-2 border rounded"
+                  : "w-full p-2 border rounded bg-white"
+              }
+            />
+            {updateProjectFormik.errors.updatedName &&
+              updateProjectFormik.touched.updatedName && (
+                <p className="text-xs mb-1 text-red-500">
+                  {updateProjectFormik.errors.updatedName}
+                </p>
+              )}
+            <div className="w-full flex gap-7">
+              <div className="w-1/2">
+                <label className="block text-gray-600">Start Date:</label>
+                <input
+                  type="datetime-local"
+                  name="updatedStartDate"
+                  value={updateProjectFormik.values.updatedStartDate}
+                  onChange={updateProjectFormik.handleChange}
+                  onBlur={updateProjectFormik.handleBlur}
+                  className={
+                    updateProjectFormik.errors.updatedStartDate &&
+                    updateProjectFormik.touched.updatedStartDate
+                      ? "input-error w-full p-2 border rounded"
+                      : "w-full p-2 border rounded"
+                  }
+                />
+                {updateProjectFormik.errors.updatedStartDate &&
+                  updateProjectFormik.touched.updatedStartDate && (
+                    <p className="text-xs mb-1 text-red-500">
+                      {updateProjectFormik.errors.updatedStartDate}
+                    </p>
+                  )}
+              </div>
+
+              <div className="w-1/2">
+                <label className="block text-gray-600">End Date:</label>
+                <input
+                  type="datetime-local"
+                  name="updatedEndDate"
+                  onChange={updateProjectFormik.handleChange}
+                  onBlur={updateProjectFormik.handleBlur}
+                  value={updateProjectFormik.values.updatedEndDate}
+                  className={
+                    updateProjectFormik.errors.updatedEndDate &&
+                    updateProjectFormik.touched.updatedEndDate
+                      ? "input-error w-full p-2 border rounded"
+                      : "w-full p-2 border rounded"
+                  }
+                />
+                {updateProjectFormik.errors.updatedEndDate &&
+                  updateProjectFormik.touched.updatedEndDate && (
+                    <p className="text-xs mb-1 text-red-500">
+                      {updateProjectFormik.errors.updatedEndDate}
+                    </p>
+                  )}
+              </div>
+            </div>
+            <label className="block text-gray-600">Description:</label>
+            <textarea
+              name="updatedDescription"
+              value={updateProjectFormik.values.updatedDescription}
+              onChange={updateProjectFormik.handleChange}
+              onBlur={updateProjectFormik.handleBlur}
+              className={
+                updateProjectFormik.errors.updatedDescription &&
+                updateProjectFormik.touched.updatedDescription
+                  ? "input-error w-full p-2 border rounded"
+                  : "w-full p-2 border rounded"
+              }
+            />
+            {updateProjectFormik.errors.updatedDescription &&
+              updateProjectFormik.touched.updatedDescription && (
+                <p className="text-xs mb-1 text-red-500">
+                  {updateProjectFormik.errors.updatedDescription}
+                </p>
+              )}
+
+            <label className="block text-gray-600">Budget:</label>
+            <input
+              type="text"
+              name="updatedBudget"
+              value={updateProjectFormik.values.updatedBudget}
+              onChange={updateProjectFormik.handleChange}
+              onBlur={updateProjectFormik.handleBlur}
+              className={
+                updateProjectFormik.errors.updatedBudget &&
+                updateProjectFormik.touched.updatedBudget
+                  ? "input-error w-full p-2 border rounded"
+                  : "w-full p-2 border rounded"
+              }
+            />
+            {updateProjectFormik.errors.updatedBudget &&
+              updateProjectFormik.touched.updatedBudget && (
+                <p className="text-xs mb-1 text-red-500">
+                  {updateProjectFormik.errors.updatedBudget}
+                </p>
+              )}
+
+            <div className="flex justify-around gap-2 mt-2">
+              <button
+                onClick={() => setIsEditing(false)}
+                className=" w-[50%] px-4 py-2 bg-gray-400 text-white rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={updateProjectFormik.isSubmitting}
+                onClick={()=> updateProject()}
+                className="w-[50%] px-4 py-2 bg-blue-600 text-white rounded-md"
+              >
+                Update
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

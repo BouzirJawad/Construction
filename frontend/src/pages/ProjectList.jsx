@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import axios from "axios";
 import ProjectListCard from "../components/ProjectListCard";
 import { AddProjectIcon } from "../icons/AddProjectIcon";
-import { addProject } from "../schemas/addproduct";
+import { addProject } from "../schemas/addproject";
 import toast, { Toaster } from "react-hot-toast";
 
 function ProjectList() {
@@ -76,16 +76,18 @@ function ProjectList() {
       <Toaster position="top-center" />
       <section className="w-[95%] min-h-screen bg-gray-100/ mx-auto shadow-xl rounded-2xl m-5">
         <div className="flex items-center justify-center">
-          <p className="w-1/2 text-blue-700 text-4xl text-center font-bold py-5">Projects</p>
-          {projects.length >= 6 && 
-              <button
+          <p className="w-1/2 text-blue-700 text-4xl text-center font-bold py-5">
+            Projects
+          </p>
+          {projects.length >= 6 && (
+            <button
               onClick={() => setIsAdding(true)}
               className="mx-auto h-fit text-center place-content-around flex items-center gap-2 primary-btn"
             >
               <AddProjectIcon />
               <p className="text-center ">Add a project</p>
             </button>
-            }
+          )}
         </div>
 
         {projects.length > 0 ? (
@@ -101,15 +103,15 @@ function ProjectList() {
                 budget={project.budget}
               />
             ))}
-            {projects.length < 6 && 
+            {projects.length < 6 && (
               <button
-              onClick={() => setIsAdding(true)}
-              className="w-[90%] mx-auto h-fit text-center place-content-around flex items-center gap-2 primary-btn"
-            >
-              <AddProjectIcon />
-              <p className="text-center ">Add a project</p>
-            </button>
-            }
+                onClick={() => setIsAdding(true)}
+                className="w-[90%] mx-auto h-fit text-center place-content-around flex items-center gap-2 primary-btn"
+              >
+                <AddProjectIcon />
+                <p className="text-center ">Add a project</p>
+              </button>
+            )}
           </div>
         ) : (
           <>
