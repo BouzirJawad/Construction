@@ -78,14 +78,51 @@ function TaskDisplay() {
         resources: [...prevTask.resources, newResource],
       }));
 
-      toast.success("Resource Created Successfully!", { duration: 2000 });
+      toast.success("Resource Created Successfully!", { duration: 4000 });
       setTimeout(() => {
         resetForm();
         setIsAdding(false);
-      }, 2000);
+      }, 1000);
     } catch (err) {
       toast.error("Failed to create Resource! please try again.");
       console.error("Error to create resource", err);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      const response = await axios.delete(`http://127.0.0.1:7460/api/tasks/${taskId}`)
+
+      if (response.status === 200) {
+        toast.success("Task deleted successfully!", {duration:4000})
+        navigate(`/projects/${task.projectId}`)
+      } else {
+        toast.error("Failed to delete task", {duration:4000});
+        console.error("Failed to delete task");
+      }
+    } catch (error) {
+      toast.error("Error Deleting Task", {duration:4000})
+      console.error("Error Deleting Task", error);
+    }
+  };
+
+  const deleteResource = async (resourceId) => {
+    try {
+      const response = await axios.delete(`http://127.0.0.1:7460/api/resources/${resourceId}`)
+
+      if (response.status === 200) {
+        toast.success("Resource deleted successfully!", {duration:4000})
+
+        const response = await axios.get(`http://127.0.0.1:7460/api/tasks/${taskId}`)
+        setTask(response.data);
+
+      } else {
+        toast.error("Failed to delete resource", {duration:4000});
+        console.error("Failed to delete resource");
+      }
+    } catch (error) {
+      toast.error("Error Deleting Resource", {duration:4000})
+      console.error("Error Deleting Resource", error);
     }
   };
 
@@ -109,7 +146,7 @@ function TaskDisplay() {
             <button className="text-2xl">
               <ModifyIcon />
             </button>
-            <button className="text-2xl">
+            <button className="text-2xl" onClick={()=> deleteTask(taskId)}>
               <DeleteIcon />
             </button>
           </div>
@@ -160,7 +197,7 @@ function TaskDisplay() {
                           <button className="text-xl">
                             <ModifyIcon />
                           </button>
-                          <button className="text-xl">
+                          <button className="text-xl" onClick={()=> deleteResource(resource._id)}>
                             <DeleteIcon />
                           </button>
                         </div>

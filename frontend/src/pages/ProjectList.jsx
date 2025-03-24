@@ -59,12 +59,12 @@ function ProjectList() {
         budget: values.budget,
       });
 
-      toast.success("Project Created Successfully!", { duration: 2000 });
+      toast.success("Project Created Successfully!", { duration: 4000 });
       fetchProjects();
       setTimeout(() => {
         resetForm();
         setIsAdding(false);
-      }, 1000);
+      }, 700);
     } catch (err) {
       toast.error("Failed to create project! please try again.");
       console.error("Error to create project", err);

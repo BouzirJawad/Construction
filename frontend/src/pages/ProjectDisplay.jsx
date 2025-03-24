@@ -76,14 +76,31 @@ function ProjectDisplay() {
         tasks: [...prevProject.tasks, newTask],
       }));
 
-      toast.success("Task Created Successfully!", { duration: 2000 });
+      toast.success("Task Created Successfully!", { duration: 4000 });
       setTimeout(() => {
         resetForm();
         setIsAdding(false);
-      }, 2000);
+      }, 700);
     } catch (err) {
       toast.error("Failed to create Task! please try again.");
       console.error("Error to create task", err);
+    }
+  };
+
+  const deleteProject = async (projectId) => {
+    try {
+      const response = await axios.delete(`http://127.0.0.1:7460/api/projects/${projectId}`)
+
+      if (response.status === 200) {
+        toast.success("Project deleted successfully!", {duration:4000})
+        navigate('/')
+      } else {
+        toast.error("Failed to delete projct", {duration:4000});
+        console.error("Failed to delete projct");
+      }
+    } catch (error) {
+      toast.error("Error Deleting Project", {duration:4000})
+      console.error("Error Deleting Project", error);
     }
   };
 
@@ -107,7 +124,7 @@ function ProjectDisplay() {
             <button className="text-2xl">
               <ModifyIcon />
             </button>
-            <button className="text-2xl">
+            <button className="text-2xl" onClick={()=>deleteProject(projectId)}>
               <DeleteIcon />
             </button>
           </div>
