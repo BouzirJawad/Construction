@@ -76,7 +76,7 @@ function ProjectDisplay() {
         tasks: [...prevProject.tasks, newTask],
       }));
 
-      toast.success("Project Created Successfully!", { duration: 2000 });
+      toast.success("Task Created Successfully!", { duration: 2000 });
       setTimeout(() => {
         resetForm();
         setIsAdding(false);
@@ -100,7 +100,7 @@ function ProjectDisplay() {
             <button onClick={() => navigate('/')} className="text-2xl">
               <BackIcon />
             </button>
-            <p className="text-2xl">{project.name}</p>
+            <p className="text-2xl text-blue-800">{project.name}</p>
           </div>
 
           <div className="flex">
@@ -119,7 +119,7 @@ function ProjectDisplay() {
             className={
               viewInfo
                 ? "border-b-2 w-1/2 text-center cursor-pointer py-1"
-                : "w-1/2 text-center cursor-pointer py-1"
+                : "w-1/2 text-center cursor-pointer py-1 hover:scale-115 transition duration-300"
             }
           >
             <p className="font-bold">Info</p>
@@ -128,7 +128,7 @@ function ProjectDisplay() {
             onClick={() => setviewInfo(false)}
             className={
               viewInfo
-                ? "w-1/2 text-center cursor-pointer py-1"
+                ? "w-1/2 text-center cursor-pointer py-1 hover:scale-115 transition duration-300"
                 : "border-b-2 w-1/2 text-center cursor-pointer py-1"
             }
           >
@@ -149,7 +149,7 @@ function ProjectDisplay() {
               <div className="grid grid-cols-1 gap-3 m-5">
                 <button
                   onClick={() => setIsAdding(true)}
-                  className="mx-auto h-fit text-center place-content-around flex items-center gap-2 primary-btn my-5"
+                  className="mx-auto w-50 h-fit max-w-xl text-center place-content-around flex items-center gap-2 primary-btn my-5"
                 >
                   <AddIcon />
                   <p className="text-center ">Add a Task</p>
@@ -170,7 +170,7 @@ function ProjectDisplay() {
                 <p className="text-center mt-5">No Tasks found.</p>
                 <button
                   onClick={() => setIsAdding(true)}
-                  className="mx-auto h-fit text-center place-content-around flex items-center gap-2 primary-btn my-5"
+                  className="mx-auto w-50 h-fit text-center place-content-around flex items-center gap-2 primary-btn my-5"
                 >
                   <AddIcon />
                   <p className="text-center ">Add a Task</p>
@@ -206,7 +206,7 @@ function ProjectDisplay() {
             )}
 
             <div className="flex gap-7">
-              <div>
+              <div className="w-1/2">
                 <label className="block text-gray-600">Start Date:</label>
                 <input
                   type="datetime-local"
@@ -227,7 +227,7 @@ function ProjectDisplay() {
                 )}
               </div>
 
-              <div>
+              <div className="w-1/2">
                 <label className="block text-gray-600">End Date:</label>
                 <input
                   type="datetime-local"

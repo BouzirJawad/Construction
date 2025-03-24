@@ -7,13 +7,7 @@ const Resource = require('../models/Resource')
 router.post("/", async (req, res) => {
     try {
         const { name, description, startDate, budget, endDate} = req.body
-
-        const formattedStartDate = new Date(startDate).toISOString().split("T")[0];
-        const formattedEndDate = new Date(endDate).toISOString().split("T")[0];
-
-        console.log(formattedStartDate);
-
-        const project = new Project({name, description, startDate: formattedStartDate, endDate: formattedEndDate, budget })
+        const project = new Project({name, description, startDate, endDate, budget })
 
         await project.save()
         res.status(201).json(project);

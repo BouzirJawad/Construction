@@ -19,6 +19,9 @@ const TaskSchema = mongoose.Schema({
       ref: "Resource",
     },
   ],
+  projectId:{
+    type: String,
+  }
 });
 
 const taskModel = mongoose.model("Task", TaskSchema);

@@ -64,7 +64,7 @@ function ProjectList() {
       setTimeout(() => {
         resetForm();
         setIsAdding(false);
-      }, 2000);
+      }, 1000);
     } catch (err) {
       toast.error("Failed to create project! please try again.");
       console.error("Error to create project", err);
@@ -76,7 +76,7 @@ function ProjectList() {
       <Toaster position="top-center" />
       <section className="w-[95%] min-h-screen bg-gray-100/ mx-auto shadow-xl rounded-2xl m-5">
         <div className="flex items-center justify-center">
-          <p className="w-1/2 text-4xl text-center font-bold py-5">Projects</p>
+          <p className="w-1/2 text-blue-700 text-4xl text-center font-bold py-5">Projects</p>
           {projects.length >= 6 && 
               <button
               onClick={() => setIsAdding(true)}
@@ -89,7 +89,7 @@ function ProjectList() {
         </div>
 
         {projects.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 m-5">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 m-5">
             {projects.map((project) => (
               <ProjectListCard
                 key={project._id}
@@ -148,8 +148,8 @@ function ProjectList() {
             {errors.name && touched.name && (
               <p className="text-xs mb-1 text-red-500">{errors.name}</p>
             )}
-            <div className="flex gap-7">
-              <div>
+            <div className="w-full flex gap-7">
+              <div className="w-1/2">
                 <label className="block text-gray-600">Start Date:</label>
                 <input
                   type="datetime-local"
@@ -170,7 +170,7 @@ function ProjectList() {
                 )}
               </div>
 
-              <div>
+              <div className="w-1/2">
                 <label className="block text-gray-600">End Date:</label>
                 <input
                   type="datetime-local"

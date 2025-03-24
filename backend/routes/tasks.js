@@ -8,7 +8,7 @@ router.post("/", async (req, res) => {
     try {
         const { description, startDate, endDate, projectId } = req.body;
         
-        const task = new Task({ description, startDate, endDate });
+        const task = new Task({ description, startDate, endDate, projectId });
         await task.save();
 
         if (projectId) {
@@ -39,6 +39,20 @@ router.get("/", async (req, res) => {
         res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id).populate("resources")
+
+        if (!task) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        res.json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 
